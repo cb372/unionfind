@@ -7,6 +7,7 @@ object UnionFindBuild extends Build {
     id = "unionfind",
     base = file("."),
     settings = Project.defaultSettings ++ Seq(
+      organization := "com.github.cb372",
       name := "unionfind",
       scalaVersion := "2.10.2",
       version := "0.1-SNAPSHOT",

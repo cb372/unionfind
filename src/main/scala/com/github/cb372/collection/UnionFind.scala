@@ -18,9 +18,7 @@ case class UnionFind[T] private (nodes: Map[T, Node[T]], count: Int) {
    * @return an updated structure
    */
   def union(e1: T, e2: T): UnionFind[T] = {
-    // lookup elements
-    require(nodes.contains(e1) && nodes.contains(e2), 
-        "Only elements previously added can be unioned")
+    require(nodes.contains(e1) && nodes.contains(e2), "Only elements previously added can be unioned")
 
     val (rootElem1, uf1) = this.find(e1)
     val (rootElem2, uf2) = uf1.find(e2)
@@ -44,9 +42,6 @@ case class UnionFind[T] private (nodes: Map[T, Node[T]], count: Int) {
         new UnionFind(uf2.nodes + (e1 -> n1.copy(rank = rank1 + 1))
                             + (e2 -> n2.copy(parent = e1)),
                       count - 1)
-
-      // should not happen
-      case _ => uf2
     } 
   }
 
