@@ -91,9 +91,29 @@ class UnionFindSpec extends FunSpec with ShouldMatchers {
         }
       }
       
+      describe("size") {
+        it("should be equal to the number of roots") {
+          val orig = UnionFind((1 to 10000): _*)
+          val afterUnions = util.Random.shuffle(1 to 9000).foldLeft(orig){
+            (uf, elem) => uf.union(elem, elem + 10)
+          }
+          val afterMoreUnions = util.Random.shuffle(1 to 9000).foldLeft(afterUnions){
+            (uf, elem) => uf.union(elem, elem + 10)
+          }
+
+          var roots = Set[Int]()
+          for (e <- afterMoreUnions.nodes.keys) {
+            roots = roots + afterMoreUnions.find(e)._1.get
+          }
+
+          afterMoreUnions should have size(1000)
+          roots should have size(1000)
+
+        }
+      }
+
     }
-  
+
   }
-
-
+    
 }

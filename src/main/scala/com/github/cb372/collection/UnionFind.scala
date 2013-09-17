@@ -22,25 +22,25 @@ case class UnionFind[T] private (nodes: Map[T, Node[T]], count: Int) {
 
     val (rootElem1, uf1) = this.find(e1)
     val (rootElem2, uf2) = uf1.find(e2)
-    val (root1: Node[T], root2: Node[T]) = (nodes(rootElem1.get), nodes(rootElem2.get))
+    val (root1: Node[T], root2: Node[T]) = (uf2.nodes(rootElem1.get), uf2.nodes(rootElem2.get))
     (root1, root2) match {
       // both elements already in same group: nothing to do
       case (n1, n2) if n1 == n2 => this
 
       // rank1 > rank2 -> n1 becomes parent of n2, ranks stay the same
-      case (n1 @ Node(e1, rank1, _), n2 @ Node(_, rank2, _)) if rank1 > rank2 =>
-        new UnionFind(uf2.nodes + (e2 -> n2.copy(parent = e1)), 
+      case (n1 @ Node(_, rank1, _), n2 @ Node(_, rank2, _)) if rank1 > rank2 =>
+        new UnionFind(uf2.nodes + (n2.elem -> n2.copy(parent = n1.elem)), 
                       count - 1)
 
       // rank1 < rank2 -> opposite of previous case
-      case (n1 @ Node(_, rank1, _), n2 @ Node(e2, rank2, _)) if rank1 < rank2 =>
-        new UnionFind(uf2.nodes + (e1 -> n1.copy(parent = e2)), 
+      case (n1 @ Node(_, rank1, _), n2 @ Node(_, rank2, _)) if rank1 < rank2 =>
+        new UnionFind(uf2.nodes + (n1.elem -> n1.copy(parent = n2.elem)), 
                       count - 1)
 
         // equal ranks -> arbitrarily choose n1 as root and increase its rank by 1
       case (n1 @ Node(_, rank1, _), n2 @ Node(_, rank2, _)) /*if rank1 == rank2*/ =>
-        new UnionFind(uf2.nodes + (e1 -> n1.copy(rank = rank1 + 1))
-                            + (e2 -> n2.copy(parent = e1)),
+        new UnionFind(uf2.nodes + (n1.elem -> n1.copy(rank = rank1 + 1))
+                            + (n2.elem -> n2.copy(parent = n1.elem)),
                       count - 1)
     } 
   }
@@ -57,8 +57,8 @@ case class UnionFind[T] private (nodes: Map[T, Node[T]], count: Int) {
       val root = ns.head
 
       // path compression: redirect all parent pointers to point directly to root
-      val updatedNodes = ns.foldLeft (nodes) { (nodes, n) =>
-        nodes + (n.elem -> n.copy(parent = root.elem))
+      val updatedNodes = ns.foldLeft (nodes) { (ns, n) =>
+        ns + (n.elem -> n.copy(parent = root.elem))
       }
 
       (Some(root.elem), new UnionFind[T](updatedNodes, count))
